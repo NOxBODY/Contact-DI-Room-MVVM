@@ -26,7 +26,7 @@ import com.vibeoncreation.contact.helper.ContactState
 import com.vibeoncreation.contact.helper.UserEvent
 
 @Composable
-fun AddContactDialog(
+fun EditContactDialog(
     state: ContactState,
     onEvent: (UserEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -47,7 +47,7 @@ fun AddContactDialog(
 
             ) {
                 Text(
-                    text = "Add Contact",
+                    text = "Edit Contact",
                     fontSize = 20.sp,
                     color = Color.DarkGray,
                     fontWeight = FontWeight.Bold
@@ -81,7 +81,7 @@ fun AddContactDialog(
                 )
                 Button(
                     onClick = {
-                        onEvent(UserEvent.SaveContact)
+                        onEvent(UserEvent.EditContact(state.contactInEdit!!))
                     }
                 ) {
                     Text(

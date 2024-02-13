@@ -47,11 +47,7 @@ class ContactViewModel @Inject constructor(
                 }
             }
             UserEvent.HideDialog -> {
-                _state.update {
-                    it.copy(
-                        isAddingContact = false
-                    )
-                }
+                resetState()
             }
             UserEvent.SaveContact -> {
                 val firstName = state.value.firstName
@@ -68,14 +64,7 @@ class ContactViewModel @Inject constructor(
                 viewModelScope.launch {
                     dao.addContact(contact)
                 }
-                _state.update {
-                    it.copy(
-                        isAddingContact = false,
-                        firstName = "",
-                        lastName = "",
-                        phoneNumber = ""
-                    )
-                }
+                resetState()
             }
             is UserEvent.SetFirstName -> {
                 _state.update {
@@ -98,7 +87,7 @@ class ContactViewModel @Inject constructor(
                     )
                 }
             }
-            UserEvent.ShowDialog -> {
+            UserEvent.ShowAddDialog -> {
                 _state.update {
                     it.copy(
                         isAddingContact = true
@@ -108,6 +97,48 @@ class ContactViewModel @Inject constructor(
             is UserEvent.SortContacts -> {
                 _sortType.value = event.sortType
             }
+
+            is UserEvent.ShowEditDialog -> {
+                _state.update {
+                    it.copy(
+                        firstName = event.contact.firstName,
+                        lastName = event.contact.lastName,
+                        phoneNumber = event.contact.phoneNumber,
+                        contactInEdit = event.contact,
+                        isEditingContact = true
+                    )
+                }
+            }
+
+            is UserEvent.EditContact -> {
+                val firstName = state.value.firstName
+                val lastName = state.value.lastName
+                val phoneNumber = state.value.phoneNumber
+                if (firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank()) {
+                    return
+                }
+                viewModelScope.launch {
+                    dao.addContact(event.contact.copy(
+                        firstName = state.value.firstName,
+                        lastName = state.value.lastName,
+                        phoneNumber = state.value.phoneNumber
+                    ))
+                }
+                resetState()
+            }
+        }
+    }
+
+    private fun resetState() {
+        _state.update {
+            it.copy(
+                isAddingContact = false,
+                isEditingContact = false,
+                firstName = "",
+                lastName = "",
+                phoneNumber = "",
+                contactInEdit = null
+            )
         }
     }
 }
