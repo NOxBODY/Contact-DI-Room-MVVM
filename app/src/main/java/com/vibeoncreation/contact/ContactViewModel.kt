@@ -104,7 +104,7 @@ class ContactViewModel @Inject constructor(
                         firstName = event.contact.firstName,
                         lastName = event.contact.lastName,
                         phoneNumber = event.contact.phoneNumber,
-                        contactInEdit = event.contact,
+                        contactIdInEdit = event.contact.id,
                         isEditingContact = true
                     )
                 }
@@ -117,12 +117,14 @@ class ContactViewModel @Inject constructor(
                 if (firstName.isBlank() || lastName.isBlank() || phoneNumber.isBlank()) {
                     return
                 }
+                val contact = ContactModel(
+                    id = event.contactId,
+                    firstName = firstName,
+                    lastName = lastName,
+                    phoneNumber = phoneNumber
+                )
                 viewModelScope.launch {
-                    dao.addContact(event.contact.copy(
-                        firstName = state.value.firstName,
-                        lastName = state.value.lastName,
-                        phoneNumber = state.value.phoneNumber
-                    ))
+                    dao.addContact(contact)
                 }
                 resetState()
             }
@@ -137,7 +139,7 @@ class ContactViewModel @Inject constructor(
                 firstName = "",
                 lastName = "",
                 phoneNumber = "",
-                contactInEdit = null
+                contactIdInEdit = -1
             )
         }
     }
