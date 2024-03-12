@@ -1,27 +1,30 @@
 package com.vibeoncreation.contact
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vibeoncreation.contact.data.ContactDao
 import com.vibeoncreation.contact.data.ContactModel
 import com.vibeoncreation.contact.helper.ContactState
 import com.vibeoncreation.contact.helper.SortType
+import com.vibeoncreation.contact.helper.StateKey
 import com.vibeoncreation.contact.helper.UserEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ContactViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val dao: ContactDao
 ): ViewModel() {
-    private val _sortType = MutableStateFlow(SortType.FIRST_NAME)
+    private val _sortType = savedStateHandle.getStateFlow(StateKey.SORT_TYPE, SortType.FIRST_NAME)
+    @OptIn(ExperimentalCoroutinesApi::class)
     private val _contacts = _sortType
         .flatMapLatest {
             when(it) {
@@ -31,8 +34,11 @@ class ContactViewModel @Inject constructor(
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-    private val _state = MutableStateFlow(ContactState())
-    val state = combine(_state, _sortType, _contacts) { state, sortType, contacts ->
+    private val _state = savedStateHandle.getStateFlow(StateKey.SAVED_STATE, ContactState())
+
+    val state = combine(
+        _state, _sortType, _contacts
+    ) { state, sortType, contacts ->
         state.copy(
             sortType = sortType,
             contacts = contacts
@@ -67,47 +73,42 @@ class ContactViewModel @Inject constructor(
                 resetState()
             }
             is UserEvent.SetFirstName -> {
-                _state.update {
-                    it.copy(
-                        firstName = event.firstName
-                    )
-                }
+                val saveState = _state.value.copy(
+                    firstName = event.firstName
+                )
+                savedStateHandle[StateKey.SAVED_STATE] = saveState
             }
             is UserEvent.SetLastName -> {
-                _state.update {
-                    it.copy(
-                        lastName = event.lastName
-                    )
-                }
+                val saveState = _state.value.copy(
+                    lastName = event.lastName
+                )
+                savedStateHandle[StateKey.SAVED_STATE] = saveState
             }
             is UserEvent.SetPhoneNumber -> {
-                _state.update {
-                    it.copy(
-                        phoneNumber = event.phoneNumber
-                    )
-                }
+                val saveState = _state.value.copy(
+                    phoneNumber = event.phoneNumber
+                )
+                savedStateHandle[StateKey.SAVED_STATE] = saveState
             }
             UserEvent.ShowAddDialog -> {
-                _state.update {
-                    it.copy(
-                        isAddingContact = true
-                    )
-                }
+                val saveState = _state.value.copy(
+                    isAddingContact = true
+                )
+                savedStateHandle[StateKey.SAVED_STATE] = saveState
             }
             is UserEvent.SortContacts -> {
-                _sortType.value = event.sortType
+                savedStateHandle[StateKey.SORT_TYPE] = event.sortType
             }
 
             is UserEvent.ShowEditDialog -> {
-                _state.update {
-                    it.copy(
-                        firstName = event.contact.firstName,
-                        lastName = event.contact.lastName,
-                        phoneNumber = event.contact.phoneNumber,
-                        contactIdInEdit = event.contact.id,
-                        isEditingContact = true
-                    )
-                }
+                val saveState = _state.value.copy(
+                    firstName = event.contact.firstName,
+                    lastName = event.contact.lastName,
+                    phoneNumber = event.contact.phoneNumber,
+                    contactIdInEdit = event.contact.id,
+                    isEditingContact = true
+                )
+                savedStateHandle[StateKey.SAVED_STATE] = saveState
             }
 
             is UserEvent.EditContact -> {
@@ -132,15 +133,14 @@ class ContactViewModel @Inject constructor(
     }
 
     private fun resetState() {
-        _state.update {
-            it.copy(
-                isAddingContact = false,
-                isEditingContact = false,
-                firstName = "",
-                lastName = "",
-                phoneNumber = "",
-                contactIdInEdit = -1
-            )
-        }
+        val saveState = _state.value.copy(
+            isAddingContact = false,
+            isEditingContact = false,
+            firstName = "",
+            lastName = "",
+            phoneNumber = "",
+            contactIdInEdit = -1
+        )
+        savedStateHandle[StateKey.SAVED_STATE] = saveState
     }
 }

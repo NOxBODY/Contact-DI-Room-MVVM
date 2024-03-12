@@ -2,6 +2,7 @@ package com.vibeoncreation.contact.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "Contacts")
 data class ContactModel(
@@ -10,4 +11,4 @@ data class ContactModel(
     val firstName: String,
     val lastName: String,
     val phoneNumber: String
-)
+): Serializable

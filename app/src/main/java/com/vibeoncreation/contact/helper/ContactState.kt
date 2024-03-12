@@ -1,6 +1,7 @@
 package com.vibeoncreation.contact.helper
 
 import com.vibeoncreation.contact.data.ContactModel
+import java.io.Serializable
 
 data class ContactState(
     val contacts: List<ContactModel> = emptyList(),
@@ -11,4 +12,4 @@ data class ContactState(
     val isAddingContact: Boolean = false,
     val isEditingContact: Boolean = false,
     val sortType: SortType = SortType.FIRST_NAME
-)
+): Serializable
