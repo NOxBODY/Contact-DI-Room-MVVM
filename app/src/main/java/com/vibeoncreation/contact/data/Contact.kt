@@ -5,10 +5,9 @@ import androidx.room.PrimaryKey
 import java.io.Serializable
 
 @Entity(tableName = "Contacts")
-data class ContactModel(
+data class Contact(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val firstName: String,
-    val lastName: String,
-    val phoneNumber: String
+    val lastName: String
 ): Serializable

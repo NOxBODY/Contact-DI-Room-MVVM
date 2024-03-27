@@ -16,11 +16,14 @@ object AppModule {
     @Provides
     @Singleton
     fun provideContactDB(applicationContext: Application): ContactDatabase {
-        return Room.databaseBuilder(
-            applicationContext,
-            ContactDatabase::class.java,
-            "contacts.db"
-        ).build()
+        return Room
+            .databaseBuilder(
+                applicationContext,
+                ContactDatabase::class.java,
+                "contacts.db"
+            )
+            .addMigrations(ContactDatabase.MIGRATION_1_2)
+            .build()
     }
 
     @Provides

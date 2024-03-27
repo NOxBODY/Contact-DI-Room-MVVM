@@ -3,7 +3,9 @@ package com.vibeoncreation.contact.ui.widgets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -37,8 +39,9 @@ fun EditContactDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(8.dp)
-
+                modifier = Modifier
+                    .padding(8.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "Edit Contact",
@@ -64,18 +67,17 @@ fun EditContactDialog(
                         Text(text = "Last Name")
                     }
                 )
-                TextField(
-                    value = state.phoneNumber,
-                    onValueChange = {
-                        onEvent(UserEvent.SetPhoneNumber(it))
-                    },
-                    placeholder = {
-                        Text(text = "Phone Number")
-                    }
+                ExistingNumbersPart(
+                    state = state,
+                    onEvent = onEvent
+                )
+                NewNumbersPart(
+                    state = state,
+                    onEvent = onEvent
                 )
                 Button(
                     onClick = {
-                        onEvent(UserEvent.EditContact(state.contactIdInEdit))
+                        onEvent(UserEvent.EditContact)
                     }
                 ) {
                     Text(

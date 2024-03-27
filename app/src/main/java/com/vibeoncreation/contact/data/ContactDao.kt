@@ -1,26 +1,43 @@
 package com.vibeoncreation.contact.data
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Upsert
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ContactDao {
-    @Upsert
-    suspend fun addContact(contact: ContactModel)
+    @Insert(entity = Contact::class)
+    suspend fun addContact(contact: Contact)
 
-    @Delete
-    suspend fun deleteContact(contact: ContactModel)
+    @Insert(entity = PhoneNumber::class)
+    suspend fun addNumber(phoneNumber: PhoneNumber)
 
-    @Query("SELECT * FROM Contacts ORDER BY firstName")
-    fun getContactsAscByFirstName(): Flow<List<ContactModel>>
+    @Update(entity = Contact::class)
+    suspend fun updateContact(contact: Contact)
 
-    @Query("SELECT * FROM Contacts ORDER BY lastName")
-    fun getContactsAscByLastName(): Flow<List<ContactModel>>
+    @Update(entity = PhoneNumber::class)
+    suspend fun updateNumber(phoneNumber: PhoneNumber)
 
-    @Query("SELECT * FROM Contacts ORDER BY phoneNumber")
-    fun getContactsAscByPhoneNumber(): Flow<List<ContactModel>>
+    @Query("DELETE FROM Contacts WHERE id = :id")
+    suspend fun deleteContact(id: Int)
+
+    @Query("SELECT id FROM Contacts ORDER BY id DESC LIMIT 1")
+    suspend fun getLastContactId(): Int
+
+    @Query("DELETE FROM PhoneNumbers WHERE id = :id")
+    suspend fun deleteNumber(id: Int)
+
+    @Query("SELECT firstName, lastName, number, Contacts.id as contactId, PhoneNumbers.id AS phoneId FROM Contacts " +
+            "LEFT JOIN PhoneNumbers ON Contacts.id = PhoneNumbers.contactId " +
+            "ORDER BY firstName, lastName")
+    fun getContactsAscByFirstName(): Flow<List<ContactNumber>>
+
+    @Query("SELECT firstName, lastName, number, Contacts.id as contactId, PhoneNumbers.id AS phoneId FROM Contacts " +
+            "LEFT JOIN PhoneNumbers ON Contacts.id = PhoneNumbers.contactId " +
+            "ORDER BY lastName, firstName")
+    fun getContactsAscByLastName(): Flow<List<ContactNumber>>
+
+
 }
