@@ -1,7 +1,10 @@
 package com.vibeoncreation.contact.data
 
+import androidx.room.AutoMigration
 import androidx.room.Database
+import androidx.room.DeleteColumn
 import androidx.room.RoomDatabase
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -10,7 +13,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         Contact::class,
         PhoneNumber::class
                ],
-    version = 2
+    version = 3,
+    autoMigrations = [
+        AutoMigration(
+            from = 2,
+            to = 3,
+            spec = ContactDatabase.RemoveColumnMigration::class
+        )
+    ]
 )
 abstract class ContactDatabase: RoomDatabase() {
     abstract val dao: ContactDao
@@ -29,11 +39,14 @@ abstract class ContactDatabase: RoomDatabase() {
                 )
                 db.execSQL("INSERT INTO PhoneNumbers (number, contactId) " +
                         "SELECT phoneNumber, id FROM Contacts")
-                db.execSQL(
-                    "ALTER TABLE Contacts DROP COLUMN phoneNumber"
-                )
+
             }
 
         }
     }
+    @DeleteColumn(
+        tableName = "Contacts",
+        columnName = "phoneNumber"
+    )
+    class RemoveColumnMigration: AutoMigrationSpec
 }
