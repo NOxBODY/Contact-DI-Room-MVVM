@@ -2,6 +2,7 @@ package com.vibeoncreation.contact.data
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
@@ -9,6 +10,9 @@ import java.io.Serializable
     tableName = "PhoneNumbers",
     foreignKeys = [
         ForeignKey(entity = Contact::class, parentColumns = ["id"], childColumns = ["contactId"], onDelete = ForeignKey.CASCADE)
+    ],
+    indices = [
+        Index(value = ["contactId"])
     ]
 )
 data class PhoneNumber(

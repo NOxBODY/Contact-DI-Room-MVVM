@@ -1,9 +1,11 @@
 This is a sample Contact application for demonstrating examples of -
-* MVVM project architecture
+* MVI design pattern
 * Jetpack Compose declarative UI
 * Android Room local database
 * Dagger-Hilt dependency injection
 * SavedStateHandle process death survival
+
+The idea was to use MVVM, but ended up isolating UI state and user action events on top of MVVM, which is what MVI exactly is.
 
 Initially, the database used a single table to store a name and a corresponding phone number.
 

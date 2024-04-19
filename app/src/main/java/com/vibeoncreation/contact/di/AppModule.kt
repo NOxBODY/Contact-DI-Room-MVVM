@@ -23,6 +23,7 @@ object AppModule {
                 "contacts.db"
             )
             .addMigrations(ContactDatabase.MIGRATION_1_2)
+            .addMigrations(ContactDatabase.MIGRATION_3_4)
             .build()
     }
 
