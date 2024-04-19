@@ -12,8 +12,12 @@ Initially, the database used a single table to store a name and a corresponding 
 In later commits, migrations (automatic and manual) for Room Database have been used to update schema for adding the multiple phone number feature. It helped the devices running the single phone number version with some data migrate seamlessly to the new version without losing any data.
 
 ## Screenshots
-<p style="align-self: center">
+<p style="text-align: center">
     <img alt="home" src="images/home.png" />
+</p>
+<p style="text-align: center">
     <img alt="add" src="images/add.png" />
+</p>
+<p style="text-align: center">
     <img alt="edit" src="images/edit.png" />
 </p>
